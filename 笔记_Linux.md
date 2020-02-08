@@ -43,23 +43,6 @@ allprojects{
 ```
 
 5. chmod 777 ~/.gradle/init.gradle
-# netstat命令
-
-* 查看某个端口是否被占用: netstat -a|grep 6379
-       当然你也可以使用lsof命令中的方法来查看
-
-* 查找占用端口的进程
-       前面虽然知道已经有进程使用了6379端口，但是不知道是哪个进程，因此为了知道进程信息，需要使用-p(program)参数：
-
-       netstat -ap|grep 6379
-
-* 查看处于监听状态的连接
-       对于还没有建立完整连接的服务器来说，它启动后正常的状态是LISTEN状态，如果只想查看处于该状态的连接，则可以使用-l（LISTEN）参数
-
-* 不解析主机，端口等信息
-        所以慢是因为它需要做解析，使用-n（numeric）参数就可以快速显示原始数字端口或地址了：
-         netstat -anp
-* 
 # Linux_Tips
 
 1. linux 虚拟终端有256 最好使用命令 logout
@@ -196,9 +179,7 @@ ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx
 netstat -ntlp | grep nginx
 ```
 
-- - -
-
-添加nginx服务
+## 5. 添加nginx服务
 
 vim /lib/systemd/system/nginx.service
 将以下内容插入：
@@ -218,29 +199,32 @@ PrivateTmp=true
 WantedBy=multi-user.target
 ```
 
-以服务的方式启动nginx
-
+* 以服务的方式启动nginx
+```
 pkill nginx
-
 systemctl start nginx
-查看服务是否启动
+```
 
+* 查看服务是否启动
+```
  systemctl status nginx
  netstat -ntlp | grep nginx
-配置nginx服务开机自动启动
+```
 
+* 配置nginx服务开机自动启动
+```
 systemctl enable nginx
+```
+
 这下子就安装完毕了 ，配置文件在：
-
+```
 vim /usr/local/nginx/conf/nginx.conf
-可选：
+```
 
+* 隐藏nginx版本号
 nginx的版本号默认是打开的，可以在默认的错误页面和http响应头中查看到。
-
 不同版本，特别是低版本的nginx可能存在漏洞，所以如果不希望被别人获取到版本号的话，可以选择进行版本号隐藏。
-
-隐藏nginx版本号
-
+```
 cd /usr/local/nginx/conf
 vim nginx.conf
 nginx.conf文件的“server_tokens”修改成”off“：
@@ -250,38 +234,36 @@ http {
 server_tokens off;
 ...
 } 
+
 再修改fastcgi.conf
-
 vim fastcgi.conf
-
 修改如下行
-
 fastcgi_param SERVER_SOFTWARE nginx/$nginx_version;
-# 改为：
+改为：
 fastcgi_param SERVER_SOFTWARE nginx;
-重启nginx
+```
 
+* 重启nginx
+```
 systemctl restart nginx
+```
 
-- - -
-//一键安装上面四个依赖
+6. Others
+一键安装上面四个依赖
 ```
 yum -y install gcc zlib zlib-devel pcre-devel openssl openssl-devel
 ```
-
-//下载tar包
+下载tar包
 ```
 wget http://nginx.org/download/nginx-1.16.1.tar.gz
 ```
-
 安装 
 ```
 ./configure --prefix=
 ```
-
-- - -
-
-nginx path prefix: "/opt/software/nginx"
+路径
+```
+  nginx path prefix: "/opt/software/nginx"
   nginx binary file: "/opt/software/nginx/sbin/nginx"
   nginx modules path: "/opt/software/nginx/modules"
   nginx configuration prefix: "/opt/software/nginx/conf"
@@ -294,38 +276,48 @@ nginx path prefix: "/opt/software/nginx"
   nginx http fastcgi temporary files: "fastcgi_temp"
   nginx http uwsgi temporary files: "uwsgi_temp"
   nginx http scgi temporary files: "scgi_temp"
+```
 
 
-# Linux命令
-## 1. ls
-使用 -F（或 GNU 上的长选项 --classify）以在每个条目之后显示标识文件类型的指示符
-斜杠（/）表示目录（或“文件夹”）。
-星号（*）表示可执行文件。这包括二进制文件（编译代码）以及脚本（具有可执行权限的文本文件）。
-符号（@）表示符号链接（或“别名”）。
-等号（=）表示套接字。***__~~
-~~__*****__~~*
-*~~__****长****列表**** ****ls**** ****-****l**** ****
-* ****如果你不想以字节为单位，请添加 -h 标志（或 GNU 中的 --human）以将文件大小转换为更加人性化的表示方法****
+# Linux命令_ls
+* 每个条目之后显示标识文件类型的指示符  -F
+```
+使用 -F（或 GNU 上的长选项 --classify）
+斜杠（/）表示目录（或“文件夹”）
+星号（*）表示可执行文件。这包括二进制文件（编译代码）以及脚本（具有可执行权限的文本文件）
+符号（@）表示符号链接（或“别名”）
+等号（=）表示套接字
+```
+
+* 长列表 **ls**** ****-****l**** **
+
+* **如果你不想以字节为单位，请添加 -h 标志（或 GNU 中的 --human）以将文件大小转换为更加人性化的表示方法****
 ****
-* ****时间和日期格式****:**** **** --time-style****
-**full-iso：ISO 完整格式（1970-01-01 21:12:00）
+* ****时间和日期格式****:**** **** --time-style**
+```
+full-iso：ISO 完整格式（1970-01-01 21:12:00）
 long-iso：ISO 长格式（1970-01-01 21:12）
 iso：iso 格式（01-01 21:12）
 locale：本地化格式（使用你的区域设置）
 posix-STYLE：POSIX 风格（用区域设置定义替换 STYLE）
-****
-* ******列出方式****:**** ****-****m**** ****以逗号分隔文件列表**** ****;**** ****按文件扩展名而不是文件名对条目进行排序，请使用 -X（这是大写 X）****
-**
-* ****隐藏****杂项****:**** ****显示几乎所有隐藏文件（. 和 .. 除外），请使用 -A 选项****
-**
-* ******递归地列出目录****** ****-****R**
+
+```
+
+* 列出方式: -m 以逗号分隔文件列表 ; 按文件扩展名而不是文件名对条目进行排序，请使用 -X（这是大写 X）
+
+* 隐藏杂项: 显示几乎所有隐藏文件（. 和 .. 除外），请使用 -A 选项
+
+* 递归地列出目录 -R
+
 * 或许需要在列出条目时反转顺序。要这么做，你可以使用-r选项。
 
-* ****增加 / (斜线) 标记目录****  -p
-****
-* ****文件****大小****排序**** ****-****S******
-**
-****单位****大小**** ******使用**-****-**block-size=SIZE改单位大小。这里的SIZE是：
+* 增加 / (斜线) 标记目录  -p
+
+* 文件大小排序 -S
+
+* 单位大小 使用--block-size=SIZE改单位大小
+```
+这里的SIZE是
 K = Kilobyte
 M = Megabyte
 G = Gigabyte
@@ -333,38 +325,58 @@ T = Terabyte
 P = Petabyte
 E = Exabyte
 Z = Zettabyte
-Y = Yottabyte****
-**
-* ************只列出目录条目****** ****-****d**** **
+Y = Yottabyte
+```
 
-* ********不打印****所有者****信息**** ****-****g** 
-       -g隐藏了拥有者信息，—G会隐藏组信息**
-****
-* ****统计****数量**** **** ****ls ./|wc -l******
-**
-****
-****要在 Bash shell 中为命令创建别名，请在主目录中创建名为 .bash_aliases 的文件（必须在开头包含 .）。在此文件中，列出要创建的别名，然后是要为其创建别名的命令。例如：
 
-alias ls='ls -A -F -B --human --color'******
-****
-****要使别名起作用，shell 必须知道 .bash_aliases 配置文件存在。在编辑器中打开 .bashrc 文件（如果它不存在则创建它），并包含以下代码块：
+* 只列出目录条目 -d
 
-if [ -e $HOME/.bash_aliases ]; then **
-**** **** **** **source $HOME/.bash_aliases**
-**fi**
-# - - -# 
-## 2. pwdx 进程号
+* 不打印所有者信息 -g
+```
+  -g隐藏了拥有者信息，—G会隐藏组信息
+```
+
+* 统计数量  ls ./|wc -l
+
+* 创建alias
+```
+要在 Bash shell 中为命令创建别名，请在主目录中创建名为 .bash_aliases 的文件（必须在开头包含 .）。在此文件中，列出要创建的别名，然后是要为其创建别名的命令。例如：
+
+alias ls='ls -A -F -B --human --color'
+
+要使别名起作用，shell 必须知道 .bash_aliases 配置文件存在。在编辑器中打开 .bashrc 文件（如果它不存在则创建它），并包含以下代码块：
+
+if [ -e $HOME/.bash_aliases ]; then 
+   source $HOME/.bash_aliases
+fi
+```
+
+
+# Linux命令_netstat
+
+* 查看某个端口是否被占用: netstat -a|grep 6379
+       当然你也可以使用lsof命令中的方法来查看
+
+* 查找占用端口的进程
+       前面虽然知道已经有进程使用了6379端口，但是不知道是哪个进程，因此为了知道进程信息，需要使用-p(program)参数：
+
+       netstat -ap|grep 6379
+
+* 查看处于监听状态的连接
+       对于还没有建立完整连接的服务器来说，它启动后正常的状态是LISTEN状态，如果只想查看处于该状态的连接，则可以使用-l（LISTEN）参数
+
+* 不解析主机，端口等信息
+        所以慢是因为它需要做解析，使用-n（numeric）参数就可以快速显示原始数字端口或地址了：
+         netstat -anp
+
+# Linux命令
+
+* pwdx 进程号
       能查看当前进程所在的文件夹地址
 
-- - -
+* ps -ax | grep mongod
+       查看进程
 
-## 3. ps -ax | grep mongod
-      查看进程
-- - -
-## 4. 查看是否是虚拟机
-1) lspci | grep -i vmware
-
-2) dmidecode
-
-
-
+* 查看是否是虚拟机
+       1) lspci | grep -i vmware 
+       2) dmidecode

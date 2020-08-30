@@ -1,1 +1,8 @@
-# bruce_learning
+# Bruce_Learning
+
+![brucechen](./attachments/bruce_chen.png)
+
+
+
+
+

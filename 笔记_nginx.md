@@ -1,4 +1,4 @@
-# nginx# _# 配置
+# nginx 配置
 ```
 server {
   listen 80;
